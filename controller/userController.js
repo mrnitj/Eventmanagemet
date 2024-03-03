@@ -3,6 +3,7 @@ const organizerModel=require("../model/organizerSchema")
 const adminModel=require("../model/adminShema")
 const { sendEmailToUser } = require("../utils/sendEmail")
 const bcrypt=require("bcrypt")
+const jwt=require('jsonwebtoken')
 
 
 module.exports={
@@ -86,6 +87,110 @@ module.exports={
 
 
         
+
+    },
+    commonlogin:async(req,res)=>{
+
+        const email=req.body.email
+        const password=req.body.password
+        if(email==process.env.adminEmail){
+
+            const admin=await adminModel.findOne({email:email})
+            
+
+            if(admin){
+                const comparePassword = await bcrypt.compare(password,admin?.password)
+              
+                if(comparePassword){
+                    const secret = process.env.SECRET_KEY_ADMIN;
+                    const token = jwt.sign({
+                        userId: admin?._id,
+                        
+                    },
+                        secret, { expiresIn: '72h' }
+                    );
+
+                    return res.status(200).json({
+                        message:"admin login successfull",
+                        data:token
+                    })
+
+                }
+
+                return res.status(403).json({
+                  message:"invalid password",
+                })
+            }
+        return    res.status(404).json({
+                message:"please  register your email"
+            })
+            
+
+
+        }
+
+        if(email==process.env.organizerEmail){
+
+            const organizer=await organizerModel.findOne({email:email})
+
+            if(organizer){
+                const comparePassword = await bcrypt.compare(password,organizer?.password)               
+                  
+                    if(comparePassword){
+                        const secret = process.env.SECRET_KEY_ORGANIZER;
+                        const token = jwt.sign({
+                            userId: organizer?._id,
+                            
+                        },
+                            secret, { expiresIn: '72h' }
+                        );
+    
+                        return res.status(200).json({
+                            message:"organizer login successfull",
+                            data:token
+                        })
+                      
+                    }
+    
+                    return res.status(403).json({
+                        message:"invalid password",
+                      })
+                    
+            }
+          return   res.status(404).json({
+                message:"please  register your email"
+            })
+           
+            
+            
+        }
+        const user=await userModel.findOne({email:email})
+         
+        if(user){
+            const comparePassword = await bcrypt.compare(password,user?.password) 
+            if(comparePassword){
+                const secret = process.env.SECRET_KEY_USER;
+                const token = jwt.sign({
+                    userId: user?._id,
+                    
+                },
+                    secret, { expiresIn: '72h' }
+                );
+
+                return res.status(200).json({
+                    message:"user login successfull",
+                    data:token
+                })
+
+            }
+            return res.status(403).json({
+                message:"invalid password",
+              })
+        }
+        return   res.status(404).json({
+            message:"please  register your account"
+        })
+       
 
     },
 }
