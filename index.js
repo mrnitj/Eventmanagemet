@@ -23,6 +23,10 @@ async function main() {
 }
 
 
+
+const userRoute=require("./routes/userRoute")
+app.use("/api",userRoute)
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
