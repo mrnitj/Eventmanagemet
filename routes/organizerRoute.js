@@ -6,7 +6,7 @@ const organizer=require("../controller/organizerController")
  
 router.post("/postevent",tryCatchMiddleware(organizer.addAnEvent))
 
-
+router.get("/getallevents/:id",tryCatchMiddleware(organizer.getAlleventByOrganizer))
 
 
 
