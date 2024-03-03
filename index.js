@@ -27,6 +27,12 @@ async function main() {
 const userRoute=require("./routes/userRoute")
 app.use("/api",userRoute)
 
+const organizerRoute=require("./routes/organizerRoute")
+app.use("/api",organizerRoute)
+
+const adminRoute=require("./routes/adminRoute")
+app.use("/api",adminRoute)
+
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
   })
