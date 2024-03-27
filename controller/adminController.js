@@ -1,7 +1,6 @@
 const eventModel=require("../model/eventSchema")
 
 
-
 module.exports={
     getAllUnApprovedEvents:async(req,res)=>{
         const unApprovredEvents=await eventModel.find({isApproved:false}).populate("createdBy")
