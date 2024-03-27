@@ -9,6 +9,10 @@ const eventSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  freeEvent: {
+    type: Boolean,
+    default: false,
+  },
   category: {
     type: String,
     required: true,
@@ -25,7 +29,8 @@ const eventSchema = new mongoose.Schema({
     ref: "organizer",
   },
   venue: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"venue"
   },
 
   date: {
@@ -38,6 +43,7 @@ const eventSchema = new mongoose.Schema({
   maximumseats: {
     type: Number,
   },
+  
 });
 
 const event = mongoose.model("event", eventSchema);

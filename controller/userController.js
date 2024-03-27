@@ -11,6 +11,10 @@ module.exports={
         const username=req.body.username
         const email=req.body.email
         const PASSWORD=req.body.password
+        const isOrganizer=req.body.isOrganizer
+
+
+
         if(email==process.env.adminEmail){
 
             const admin=await adminModel.findOne({email:email})
@@ -36,18 +40,51 @@ module.exports={
 
         }
 
-        if(email==process.env.organizerEmail){
+        // if(email==process.env.organizerEmail){
+        //      console.log("this is working");
+        //     const organizer=await organizerModel.findOne({email:email})
+
+        //     if(!organizer){
+        //         console.log(PASSWORD);
+        //         const hashedPassword=await bcrypt.hash(PASSWORD,10)
+        //         const ORGANIZER=new organizerModel({
+        //             email:email,
+        //             password:hashedPassword,
+        //             username:username
+        //         })
+        //       await ORGANIZER .save()
+        //       return res.status(201).json({
+        //         message:"organizer registration successfull",
+        //         data:email,
+        //       })
+        //     }
+
+        //     return res.status(303).json({
+        //         message:"organizer already registered please login"
+        //     })
+
+        // }
+        const atIndex = email.indexOf('@'); 
+        const newusername = atIndex !== -1 ? email.slice(0, atIndex) : email;
+        const randomNumber = Math.floor(Math.random() * (999 - 100 + 1)) + 100; 
+        const password = newusername + randomNumber;
+        const hashedPassword=await bcrypt.hash(password,10)
+
+        if(isOrganizer){
 
             const organizer=await organizerModel.findOne({email:email})
-
-            if(!organizer){
-                const hashedPassword=await bcrypt.hash(PASSWORD,10)
+            
+                   if(!organizer){
+                // console.log(PASSWORD);
+                // const hashedPassword=await bcrypt.hash(PASSWORD,10)
                 const ORGANIZER=new organizerModel({
                     email:email,
                     password:hashedPassword,
                     username:username
                 })
               await ORGANIZER .save()
+              await sendEmailToUser(ORGANIZER,password)
+
               return res.status(201).json({
                 message:"organizer registration successfull",
                 data:email,
@@ -59,11 +96,6 @@ module.exports={
             })
 
         }
-        const atIndex = email.indexOf('@'); 
-        const newusername = atIndex !== -1 ? email.slice(0, atIndex) : email;
-        const randomNumber = Math.floor(Math.random() * (999 - 100 + 1)) + 100; 
-        const password = newusername + randomNumber;
-        const hashedPassword=await bcrypt.hash(password,10)
          
 
         const existingUser=await userModel.findOne({email:email})
@@ -93,6 +125,10 @@ module.exports={
 
         const email=req.body.email
         const password=req.body.password
+        const isOrganizer=req.body.isOrganizer
+
+
+        console.log(email,password);
         if(email==process.env.adminEmail){
 
             const admin=await adminModel.findOne({email:email})
@@ -129,9 +165,44 @@ module.exports={
 
         }
 
-        if(email==process.env.organizerEmail){
+        // if(email==process.env.organizerEmail){
 
-            const organizer=await organizerModel.findOne({email:email})
+        //     const organizer=await organizerModel.findOne({email:email})
+
+        //     if(organizer){
+        //         const comparePassword = await bcrypt.compare(password,organizer?.password)               
+                  
+        //             if(comparePassword){
+        //                 const secret = process.env.SECRET_KEY_ORGANIZER;
+        //                 const token = jwt.sign({
+        //                     userId: organizer?._id,
+                            
+        //                 },
+        //                     secret, { expiresIn: '72h' }
+        //                 );
+    
+        //                 return res.status(200).json({
+        //                     message:"organizer login successfull",
+        //                     data:token
+        //                 })
+                      
+        //             }
+    
+        //             return res.status(403).json({
+        //                 message:"invalid password",
+        //               })
+                    
+        //     }
+        //   return   res.status(404).json({
+        //         message:"please  register your email"
+        //     })
+           
+            
+            
+        // }
+
+        if(isOrganizer){
+                  const organizer=await organizerModel.findOne({email:email})
 
             if(organizer){
                 const comparePassword = await bcrypt.compare(password,organizer?.password)               
@@ -160,14 +231,14 @@ module.exports={
           return   res.status(404).json({
                 message:"please  register your email"
             })
-           
-            
-            
+
         }
         const user=await userModel.findOne({email:email})
+        console.log(user,"user");
          
         if(user){
             const comparePassword = await bcrypt.compare(password,user?.password) 
+            console.log("pass",comparePassword);
             if(comparePassword){
                 const secret = process.env.SECRET_KEY_USER;
                 const token = jwt.sign({

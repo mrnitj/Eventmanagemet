@@ -8,6 +8,7 @@ module.exports = {
 
 
     sendEmailToUser: async (user,password) => {
+        console.log(user);
 
         const email = user?.email
 
@@ -26,7 +27,7 @@ module.exports = {
         const info = await transporter.sendMail({
             from: process.env.APP_EMAIL,
             to: email,
-            subject: `Password for login as user`,
+            subject: `Password for login `,
             html: `<h4>Dear ${user?.username},</h4>
             <p>This is to acknowledge the details of your registration. Your user profile has been processed successfully.</p>
             

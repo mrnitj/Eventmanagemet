@@ -3,7 +3,7 @@ const mongoose=require("mongoose")
 
 
 const organizerSchema=new mongoose.Schema({
-    name:{
+    username:{
         type:String,
         // required:true
     },
@@ -13,6 +13,7 @@ const organizerSchema=new mongoose.Schema({
     password:{
         type:String,
     },
+    
     
 
 
