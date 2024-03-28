@@ -40,7 +40,7 @@ module.exports = {
 
     let urls = [];
 
-    const { title, place, maximumSeats, facilities,price, } = req.body;
+    const { title, place, maximumSeats, facilities,price, mapUrl } = req.body;
 
     const uploader = async (path) => await cloudinary.uploads(path,"images");
     if (req.method == "POST") {
@@ -62,7 +62,8 @@ module.exports = {
         maximumSeats,
         Facilities:facilities.split(","),
         images: urls,
-        price
+        price,
+        mapUrl
       });
       await venue.save();
       res.status(200).json({
