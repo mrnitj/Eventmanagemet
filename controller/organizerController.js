@@ -1,29 +1,62 @@
-const eventModel=require("../model/eventSchema")
+const eventModel = require("../model/eventSchema");
+const fs = require("fs");
+const cloudinary = require("../cloudinary/cloudinary");
 
+module.exports = {
+  addAnEvent: async (req, res) => {
 
+    let url = "";
 
+    const { title, category, description, date, Ticketprice, maximumSeats } =
+      req.body;
 
+     const id = req.params.id;
 
+    const uploader = async (path) => await cloudinary.uploads(path, "images");
+    if (req.method == "POST") {
+      const files = req.file;
+      
+      console.log("files",files)
 
-module.exports={
-    addAnEvent:async(req,res)=>{
-        const event=new eventModel({...req.body}) //provide the id of organizer from frontEnd itself.
-        await event.save()
+        const { path } = files;
 
-        return res.status(201).json({
-            message:"event created successfully,wait for approve"
-        })
-    },
-    getAlleventByOrganizer:async(req,res)=>{
+        const newPath = await uploader(path);
 
-        const id=req.params.id
+        url = newPath;
 
-        const jobsByorganizer=await eventModel.find({createdBy:id})
+        fs.unlinkSync(path);
+      
 
-        return res.status(200).json({
-            message:"success",
-            data:jobsByorganizer
-        })
+      const event = new eventModel({
+        title,
+        category,
+        description,
+        date,
+        Ticketprice,
+        maximumSeats,
+        image:url,
+        venue:id
+      });
+      await event.save();
+      res.status(200).json({
+        status: "success",
+        message: "Event created succesfully",
+        data: event,
+      });
+    } else {
+      res.status(400).json({
+        err: " image not uploaded",
+      });
+    }
+  },
+  getAlleventByOrganizer: async (req, res) => {
+    const id = req.params.id;
 
-    },
-}
+    const jobsByorganizer = await eventModel.find({ createdBy: id });
+
+    return res.status(200).json({
+      message: "success",
+      data: jobsByorganizer,
+    });
+  },
+};

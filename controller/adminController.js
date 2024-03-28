@@ -45,6 +45,7 @@ module.exports = {
     const uploader = async (path) => await cloudinary.uploads(path,"images");
     if (req.method == "POST") {
       const files = req.files;
+      console.log("files",files)
 
       for (const file of files) {
         const { path } = file;

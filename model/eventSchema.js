@@ -15,13 +15,13 @@ const eventSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    required: true,
+    // required: true,
   },
   description: {
     type: String,
   },
   image:{
-    type:String,
+    type:Object,
     
   },
   createdBy: {
@@ -38,7 +38,7 @@ const eventSchema = new mongoose.Schema({
   },
   Ticketprice: {
     type: Number,
-    required: true,
+    // required: true,
   },
   maximumseats: {
     type: Number,
