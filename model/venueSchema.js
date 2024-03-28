@@ -19,7 +19,7 @@ const venueSchema = new mongoose.Schema({
         type:Array
     },
     Facilities:{
-        type:String
+        type:Array
     },
     price: {
         type:Number
@@ -27,6 +27,9 @@ const venueSchema = new mongoose.Schema({
     available:{
         type:Boolean,
         default:true
+    },
+    mapUrl:{
+        type:String
     }
 })
 

@@ -40,7 +40,7 @@ module.exports = {
 
     let urls = [];
 
-    const { title, place, maximumSeats, Facilities,price, } = req.body;
+    const { title, place, maximumSeats, facilities,price, } = req.body;
 
     const uploader = async (path) => await cloudinary.uploads(path,"images");
     if (req.method == "POST") {
@@ -60,7 +60,7 @@ module.exports = {
         title,
         place,
         maximumSeats,
-        Facilities,
+        Facilities:facilities.split(","),
         images: urls,
         price
       });
