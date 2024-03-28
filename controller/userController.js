@@ -12,7 +12,8 @@ module.exports={
         const email=req.body.email
         const PASSWORD=req.body.password
         const isOrganizer=req.body.isOrganizer
-
+      
+        
 
 
         if(email==process.env.adminEmail){
@@ -78,11 +79,13 @@ module.exports={
                 // console.log(PASSWORD);
                 // const hashedPassword=await bcrypt.hash(PASSWORD,10)
                 const ORGANIZER=new organizerModel({
+                    username:username,
                     email:email,
-                    password:hashedPassword,
-                    username:username
+                    password:hashedPassword
+                   
                 })
               await ORGANIZER .save()
+              console.log("this  is org",ORGANIZER);
               await sendEmailToUser(ORGANIZER,password)
 
               return res.status(201).json({
@@ -106,6 +109,7 @@ module.exports={
         }
         const USER=new userModel({username:username,email:email,password:hashedPassword})
         const user =await USER.save()
+        // console.log(user,"this is user");
         
         if(user){
             await sendEmailToUser(user,password)
@@ -148,7 +152,8 @@ module.exports={
 
                     return res.status(200).json({
                         message:"admin login successfull",
-                        data:token
+                        data:token,
+                        type:"admin"
                     })
 
                 }
@@ -218,7 +223,9 @@ module.exports={
     
                         return res.status(200).json({
                             message:"organizer login successfull",
-                            data:token
+                            data:token,
+                            Id: organizer?._id,
+                            type:"oraganizer"
                         })
                       
                     }
@@ -234,11 +241,11 @@ module.exports={
 
         }
         const user=await userModel.findOne({email:email})
-        console.log(user,"user");
+        // console.log(user,"user");
          
         if(user){
             const comparePassword = await bcrypt.compare(password,user?.password) 
-            console.log("pass",comparePassword);
+            // console.log("pass",comparePassword);
             if(comparePassword){
                 const secret = process.env.SECRET_KEY_USER;
                 const token = jwt.sign({
@@ -250,7 +257,9 @@ module.exports={
 
                 return res.status(200).json({
                     message:"user login successfull",
-                    data:token
+                    data:token,
+                    Id: user?._id,
+                    type:"user"
                 })
 
             }

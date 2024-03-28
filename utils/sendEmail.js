@@ -8,7 +8,7 @@ module.exports = {
 
 
     sendEmailToUser: async (user,password) => {
-        console.log(user);
+        console.log(user,"this is from nodemailer");
 
         const email = user?.email
 
