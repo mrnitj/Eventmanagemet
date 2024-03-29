@@ -10,12 +10,14 @@ module.exports = {
     const { title, category, description, date, Ticketprice, maximumSeats } =
       req.body;
 
-     const id = req.params.id;
+     const eventId = req.params.id;
+
+     const organizerId = req.params.organizerId
 
     const uploader = async (path) => await cloudinary.uploads(path, "images");
     if (req.method == "POST") {
       const files = req.file;
-      
+
       console.log("files",files)
 
         const { path } = files;
@@ -35,7 +37,8 @@ module.exports = {
         Ticketprice,
         maximumSeats,
         image:url,
-        venue:id
+        venue:eventId,
+        createdBy:organizerId,
       });
       await event.save();
       res.status(200).json({
