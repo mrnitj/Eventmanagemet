@@ -1,12 +1,24 @@
 const userModel=require("../model/userSchema")
 const organizerModel=require("../model/organizerSchema")
 const adminModel=require("../model/adminShema")
+const eventModel= require("../model/eventSchema")
 const { sendEmailToUser } = require("../utils/sendEmail")
 const bcrypt=require("bcrypt")
 const jwt=require('jsonwebtoken')
 
 
 module.exports={
+    getAllEvents:async(req,res) => {
+
+        const allEvents = await eventModel.find({})
+        console.log('first')
+
+        return res.status(304).json({
+            status:'success',
+            message: "all Events fetched",
+            // data: allEvents,
+          });
+    },
     commonRegister:async(req,res)=>{
         const username=req.body.username
         const email=req.body.email
@@ -273,4 +285,5 @@ module.exports={
        
 
     },
+   
 }

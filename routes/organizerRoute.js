@@ -5,7 +5,7 @@ const organizer=require("../controller/organizerController")
 const upload = require('../middlewares/multerMiddleware')
 
  
-router.post("/postevent/:id",upload.single("image"),tryCatchMiddleware(organizer.addAnEvent))
+router.post("/postevent/:id/:organizerId",upload.single("image"),tryCatchMiddleware(organizer.addAnEvent))
 
 router.get("/getallevents/:id",tryCatchMiddleware(organizer.getAlleventByOrganizer))
 
