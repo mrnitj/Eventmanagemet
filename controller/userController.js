@@ -2,21 +2,37 @@ const userModel=require("../model/userSchema")
 const organizerModel=require("../model/organizerSchema")
 const adminModel=require("../model/adminShema")
 const eventModel= require("../model/eventSchema")
+const orderModel =require("../model/orderSchema")
 const { sendEmailToUser } = require("../utils/sendEmail")
+const Razorpay = require('razorpay')
 const bcrypt=require("bcrypt")
+const crypto = require('crypto')
 const jwt=require('jsonwebtoken')
 
 
 module.exports={
+    getAllBookings:async(req,res) => {
+
+        const userId = req.params.id
+
+        const bookings = await orderModel.find(userId).populate("event")
+
+        
+    return res.status(200).json({
+        message: "success",
+        data: bookings,
+      });
+
+    },
     getAllEvents:async(req,res) => {
 
-        const allEvents = await eventModel.find({})
-        console.log('first')
+        const allEvents = await eventModel.find({}).populate('venue')
+    
 
-        return res.status(304).json({
+        return res.status(200).json({
             status:'success',
             message: "all Events fetched",
-            // data: allEvents,
+            data: allEvents,
           });
     },
     commonRegister:async(req,res)=>{
@@ -285,5 +301,64 @@ module.exports={
        
 
     },
+    paymentInit:async(req,res) => {
+
+        const instance = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
+          });
+        
+          const options = {
+            amount: req.body.amount * 100,
+            currency: "INR",
+            receipt: crypto.randomBytes(10).toString("hex"),
+          };  
+        
+          instance.orders.create(options, (error, order) => {
+            if (error) {
+              console.log(error);
+              return res.status(500).json({ message: "Something Went Wrong!" });
+            }
+            res.status(200).json({ data: order });
+            });
+    },
+
+    verifyPayment:async(req,res) => {
+
+
+   const event = req.params.id
+   const userId = req.params.user
+
+
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature} = req.body;
+
+        const sign = razorpay_order_id + "|" + razorpay_payment_id;
+		const expectedSign = crypto
+			.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
+			.update(sign.toString())
+			.digest("hex");
+
+            if (razorpay_signature === expectedSign) {
+
+                const order = new orderModel({
+                    totalTickets:2,
+                    totalAmount:500,
+                    event:event,
+                    userId:userId,
+
+                })
+          
+                await order.save();
+          
+          
+                res.status(200).json({
+                status:"success",
+                message: "Payment verified successfully",
+                data:order,
+                });
+                  } else {
+                      return res.status(400).json({ message: "Invalid signature sent!" });
+                  }
+    }
    
 }
