@@ -15,7 +15,12 @@ module.exports={
 
         const userId = req.params.id
 
-        const bookings = await orderModel.find(userId).populate("event")
+        const bookings = await orderModel.find(userId).populate({
+            path: 'event',
+            populate: {
+              path: 'venue' 
+            }
+          })
 
         
     return res.status(200).json({
@@ -330,7 +335,7 @@ module.exports={
    const userId = req.params.user
 
 
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature} = req.body;
+        const { razorpay_order_id, razorpay_payment_id, razorpay_signature,totalTickets,totalAmount} = req.body;
 
         const sign = razorpay_order_id + "|" + razorpay_payment_id;
 		const expectedSign = crypto
@@ -341,11 +346,11 @@ module.exports={
             if (razorpay_signature === expectedSign) {
 
                 const order = new orderModel({
-                    totalTickets:2,
-                    totalAmount:500,
+                    totalTickets:totalTickets,
+                    totalAmount:totalAmount,
                     event:event,
                     userId:userId,
-
+                    razorpay_payment_id:razorpay_payment_id
                 })
           
                 await order.save();
@@ -359,6 +364,42 @@ module.exports={
                   } else {
                       return res.status(400).json({ message: "Invalid signature sent!" });
                   }
-    }
+    },
+    cancelOrder:async(req,res) => {
+        try {
+
+            const payment_id = req.body.paymentId
+            const amount = req.body.amount
+
+            const deletedOrder = await orderModel.findOneAndDelete({ razorpay_payment_id: payment_id });
+            if (!deletedOrder) {
+                return res.status(404).json({ error: 'Order not found.' });
+            }
+        const razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
+        });
+
+   
+ 
+ const razorpayResponse = razorpay.payments.refund(payment_id,{
+    "amount": amount,
+    "speed": "optimum",
+  })
+ 
+ 
+ res.status(200).json({
+    status:"success",
+    message: "Payment refunded successfully",
+    data:await razorpayResponse,
+    })
+} catch (error) {
+    
+    console.log(error);
+
+    res.status(400).json({data:error});
+
+}
+},
    
 }
