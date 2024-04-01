@@ -16,6 +16,9 @@ const orderSchema=new mongoose.Schema({
     event:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"event"
+    },
+    razorpay_payment_id:{
+        type:String
     }
     
 
