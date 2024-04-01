@@ -8,6 +8,7 @@ const Razorpay = require('razorpay')
 const bcrypt=require("bcrypt")
 const crypto = require('crypto')
 const jwt=require('jsonwebtoken')
+const user = require("../model/userSchema")
 
 
 module.exports={
@@ -334,6 +335,8 @@ module.exports={
    const event = req.params.id
    const userId = req.params.user
 
+   console.log("from verify",event,userId);
+
 
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature,totalTickets,totalAmount} = req.body;
 
@@ -369,9 +372,10 @@ module.exports={
         try {
 
             const payment_id = req.body.paymentId
+            console.log(payment_id)
             const amount = req.body.amount
 
-            const deletedOrder = await orderModel.findOneAndDelete({ razorpay_payment_id: payment_id });
+            const deletedOrder = await orderModel.findByIdAndDelete({ _id: payment_id });
             if (!deletedOrder) {
                 return res.status(404).json({ error: 'Order not found.' });
             }
