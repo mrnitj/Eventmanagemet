@@ -38,18 +38,6 @@ const io = new Server(server, {
 
 
 
-// io.on('connection', (socket) => {
-//   // Handle chat messages coming from clients
-//   socket.on('chat_message', async (data) => {
-//     const newMessage = new chatMessage(data);
-
-//     console.log('newMessage',newMessage)
-//     await newMessage.save(); // Save message to database
-
-//     // Emit the message to the appropriate receiver
-//     io.emit(`chat_message ${data.receiverId}`, data); // Broadcast to specific receiver
-//   });
-// });
 
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
@@ -70,7 +58,7 @@ io.on("connection", (socket) => {
         sender: data.author,
         reciever:data.reciever,
         message: data.message,
-        time: new Date(),
+        time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
         
       });
       await newMessage.save();
